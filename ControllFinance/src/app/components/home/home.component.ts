@@ -1,4 +1,5 @@
 import { Component, OnInit } from '@angular/core';
+import { Finance } from 'src/app/models/finance';
 
 @Component({
   selector: 'app-home',
@@ -7,11 +8,23 @@ import { Component, OnInit } from '@angular/core';
 })
 export class HomeComponent implements OnInit {
 
+  //cards
   valorTotal = 0;
   saida = 0;
   entrada = 0;
   investimentos = 0;
 
+  //objeto da model
+  financa: Finance = {
+    tipo: 'Entrada',
+    valor: 888  ,
+    data: '12/01/2020'
+  }
+
+  //array de objeto da model
+  financas: Finance[] = []
+
+  //array tradicional
   finance = [{
     tipo: 'Entrada',
     valor: 2650,
@@ -46,6 +59,7 @@ export class HomeComponent implements OnInit {
   constructor() { }
 
   ngOnInit(): void {
+    this.financas.push(this.financa)
     this.somaSaidas()
     this.somaInvestimento()
     this.somaEntrada()
@@ -57,11 +71,13 @@ export class HomeComponent implements OnInit {
   }
 
   somaSaidas(){
+    var soma = this.finance.map(item => item.valor).reduce((prev, curr) => prev + curr, 0);
     for(let alt = 0; alt < this.finance.length; alt ++){
       if(this.finance[alt].tipo === 'Saida'){
         this.saida += this.finance[alt].valor;
       }
     }
+    console.log(soma);
   }
   somaEntrada(){
     for(let alt = 0; alt < this.finance.length; alt ++){
@@ -80,6 +96,7 @@ export class HomeComponent implements OnInit {
 
   excluirItem(id: number | string){
    this.finance.splice(Number(id),1) 
+   
    this.valorTotal = 0;
    this.saida = 0;
    this.entrada = 0;
