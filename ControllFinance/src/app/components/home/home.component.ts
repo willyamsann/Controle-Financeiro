@@ -13,6 +13,11 @@ export class HomeComponent implements OnInit {
   saida = 0;
   entrada = 0;
   investimentos = 0;
+  financeModel: Finance = {
+    tipo: 'Entrada',
+    valor: 888  ,
+    data: '12/01/2020'
+  }
 
   //objeto da model
   financa: Finance = {
@@ -60,6 +65,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.financas.push(this.financa)
+    this.loadLocalStorange()
     this.somaSaidas()
     this.somaInvestimento()
     this.somaEntrada()
@@ -72,30 +78,32 @@ export class HomeComponent implements OnInit {
 
   somaSaidas(){
     var soma = this.finance.map(item => item.valor).reduce((prev, curr) => prev + curr, 0);
-    for(let alt = 0; alt < this.finance.length; alt ++){
-      if(this.finance[alt].tipo === 'Saida'){
-        this.saida += this.finance[alt].valor;
+    for(let alt = 0; alt < this.financas.length; alt ++){
+      if(this.financas[alt].tipo === 'Saida'){
+        this.saida += this.financas[alt].valor?.valueOf() || 0 
       }
+      this.financas[alt].tipo === 'Saida' ? 0 : 10;
     }
     console.log(soma);
   }
   somaEntrada(){
-    for(let alt = 0; alt < this.finance.length; alt ++){
-      if(this.finance[alt].tipo === 'Entrada'){
-        this.entrada += this.finance[alt].valor;
+    for(let alt = 0; alt < this.financas.length; alt ++){
+      if(this.financas[alt].tipo === 'Entrada'){
+        this.entrada += this.financas[alt].valor?.valueOf() || 0 
       }
     }
   }
   somaInvestimento(){
-    for(let alt = 0; alt < this.finance.length; alt ++){
-      if(this.finance[alt].tipo === 'Investimento'){
-        this.investimentos += this.finance[alt].valor;
+    for(let alt = 0; alt < this.financas.length; alt ++){
+      if(this.financas[alt].tipo === 'Investimento'){
+        this.investimentos += this.financas[alt].valor?.valueOf() || 0 
       }
     }
   }
 
   excluirItem(id: number | string){
    this.finance.splice(Number(id),1) 
+
    
    this.valorTotal = 0;
    this.saida = 0;
@@ -105,6 +113,54 @@ export class HomeComponent implements OnInit {
    this.somaInvestimento()
    this.somaEntrada()
    this.somaTotal()
+  }
+
+  createFinance(){
+    this.financas.push({
+      tipo: this.financeModel.tipo,
+      valor: this.financeModel.valor,
+      data: this.financeModel.data
+    });
+    this.valorTotal = 0;
+    this.saida = 0;
+    this.entrada = 0;
+    this.investimentos = 0;
+    this.somaSaidas()
+    this.somaInvestimento()
+    this.somaEntrada()
+    this.somaTotal()
+    this.saveLocalStorange()
+  }
+
+  recalcular(){
+    this.valorTotal = 0;
+    this.saida = 0;
+    this.entrada = 0;
+    this.investimentos = 0;
+    this.somaSaidas()
+    this.somaInvestimento()
+    this.somaEntrada()
+    this.somaTotal()
+  }
+
+  saveLocalStorange(){
+    if(localStorage.length != 0){
+      if(!localStorage.getItem("local_fuctura")){
+        localStorage.setItem("local_fuctura",JSON.stringify(this.financas))
+    }else{
+      localStorage.removeItem("local_fuctura")
+      localStorage.setItem("local_fuctura",JSON.stringify(this.financas))
+    }
+  }
+}
+
+  loadLocalStorange(){
+    if(localStorage.length != 0){
+      if(localStorage.getItem("local_fuctura")){
+        let financas = localStorage.getItem("local_fuctura");
+        this.financas = JSON.parse(financas || '');
+      }
+    }
   }
 
 }
