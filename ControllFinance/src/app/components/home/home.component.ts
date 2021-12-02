@@ -1,5 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { Finance } from 'src/app/models/finance';
+import { ToastrService } from 'ngx-toastr';
 
 @Component({
   selector: 'app-home',
@@ -61,7 +62,7 @@ export class HomeComponent implements OnInit {
     data: '20/02/2021'
   },
 ]
-  constructor() { }
+  constructor(private toastr: ToastrService) { }
 
   ngOnInit(): void {
     this.financas.push(this.financa)
@@ -102,8 +103,8 @@ export class HomeComponent implements OnInit {
   }
 
   excluirItem(id: number | string){
-   this.finance.splice(Number(id),1) 
-
+   this.financas.splice(Number(id),1) 
+    console.log("EXCLUIR")
    
    this.valorTotal = 0;
    this.saida = 0;
@@ -113,9 +114,15 @@ export class HomeComponent implements OnInit {
    this.somaInvestimento()
    this.somaEntrada()
    this.somaTotal()
+   this.saveLocalStorange()
+
   }
 
   createFinance(){
+    if(this.financeModel.tipo === "Saida" &&  this.financeModel.valor?.valueOf || 0 > 1000){
+      this.toastr.error('Maior que 1000!', 'Não foi possivel');
+      return
+    }
     this.financas.push({
       tipo: this.financeModel.tipo,
       valor: this.financeModel.valor,
@@ -130,6 +137,7 @@ export class HomeComponent implements OnInit {
     this.somaEntrada()
     this.somaTotal()
     this.saveLocalStorange()
+    this.toastr.success('Cadastrado!', 'Sucesso');
   }
 
   recalcular(){
@@ -141,6 +149,8 @@ export class HomeComponent implements OnInit {
     this.somaInvestimento()
     this.somaEntrada()
     this.somaTotal()
+    this.saveLocalStorange()
+
   }
 
   saveLocalStorange(){
